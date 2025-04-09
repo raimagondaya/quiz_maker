@@ -1,24 +1,29 @@
+import random
+
+file_path = r"C:\OOP\simple-number-programs\quiz_maker\confidential_quiz_bank.txt"
+
 questions = []
 options = []
 answers = []
 
 while True:
-    print("Add a New Question")
     question = input("Enter your question: ")
-    questions.append(question)
-
-    print("Enter the choices:")
     opt_a = input("A. ")
     opt_b = input("B. ")
     opt_c = input("C. ")
     opt_d = input("D. ")
-    options.append([f"A. {opt_a}", f"B. {opt_b}", f"C. {opt_c}", f"D. {opt_d}"])
-
     correct = input("Enter the correct answer (A, B, C, or D): ").upper()
+
     while correct not in ['A', 'B', 'C', 'D']:
-        print("Invalid choice. Please choose A, B, C, or D only.")
         correct = input("Enter the correct answer (A, B, C, or D): ").upper()
-    answers.append(correct)
+
+    with open(file_path, "a", encoding="utf-8") as f:
+        f.write(question.strip() + "\n")
+        f.write(opt_a.strip() + "\n")
+        f.write(opt_b.strip() + "\n")
+        f.write(opt_c.strip() + "\n")
+        f.write(opt_d.strip() + "\n")
+        f.write(correct.strip() + "\n")
 
     another = input("Add another question? (yes/no): ").lower()
     if another != 'yes':
@@ -26,26 +31,45 @@ while True:
 
 print("QUIZ START !!!")
 
-score = 0
-guesses = []
+with open(file_path, "r", encoding="utf-8") as f:
+    lines = [line.strip() for line in f if line.strip()]
 
-for i in range(len(questions)):
+quiz_data = []
+i = 0
+while i + 5 < len(lines):
+    question = lines[i]
+    opt_a = lines[i+1]
+    opt_b = lines[i+2]
+    opt_c = lines[i+3]
+    opt_d = lines[i+4]
+    correct = lines[i+5]
+    quiz_data.append((
+        question,
+        [f"A. {opt_a}", f"B. {opt_b}", f"C. {opt_c}", f"D. {opt_d}"],
+        correct
+    ))
+    i += 6
+
+random.shuffle(quiz_data)
+
+score = 0
+
+for question, options, correct in quiz_data:
     print("_________________")
-    print(questions[i])
-    for option in options[i]:
-        print(option)
+    print(question)
+    for opt in options:
+        print(opt)
 
     guess = input("Enter your choice of answer (A, B, C, or D): ").upper()
-    guesses.append(guess)
 
-    if guess == answers[i]:
+    if guess == correct:
         score += 1
         print("Koreque! UwU")
     else:
         print("INCORRECT >:c ")
-        print(f"{answers[i]} is the correct answer.")
+        print(f"{correct} is the correct answer.")
 
 print("__________")
 print("     RESULTS     ")
 print("______________")
-print(f"Your score is: {score}/{len(questions)}")
+print(f"Your score is: {score}/{len(quiz_data)}")
