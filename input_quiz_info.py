@@ -1,12 +1,14 @@
+import tkinter as tk
 import random
 
-file_path = r"C:\OOP\simple-number-programs\quiz_maker\confidential_quiz_bank.txt"
+file_path = r"C:\\OOP\\simple-number-programs\\quiz_maker\\confidential_quiz_bank.txt"
 
 questions = []
 options = []
 answers = []
 
 while True:
+    print("Welcome to quiz maker! The quiz will start after...")
     question = input("Enter your question: ")
     opt_a = input("A. ")
     opt_b = input("B. ")
@@ -29,7 +31,7 @@ while True:
     if another != 'yes':
         break
 
-print("QUIZ START !!!")
+print("Opening quiz...")
 
 with open(file_path, "r", encoding="utf-8") as f:
     lines = [line.strip() for line in f if line.strip()]
@@ -37,39 +39,56 @@ with open(file_path, "r", encoding="utf-8") as f:
 quiz_data = []
 i = 0
 while i + 5 < len(lines):
-    question = lines[i]
-    opt_a = lines[i+1]
-    opt_b = lines[i+2]
-    opt_c = lines[i+3]
-    opt_d = lines[i+4]
-    correct = lines[i+5]
     quiz_data.append((
-        question,
-        [f"A. {opt_a}", f"B. {opt_b}", f"C. {opt_c}", f"D. {opt_d}"],
-        correct
+        lines[i],
+        [lines[i+1], lines[i+2], lines[i+3], lines[i+4]],
+        lines[i+5]
     ))
     i += 6
 
 random.shuffle(quiz_data)
 
+root = tk.Tk()
+root.title("Quiz Game")
+root.geometry("800x600")
+root.configure(bg="black")
+
+question_label = tk.Label(root, text="", fg="white", bg="black", font=("Arial", 20), wraplength=700)
+question_label.pack(pady=50)
+
+buttons = []
+for _ in range(4):
+    btn = tk.Button(root, text="", font=("Arial", 16), width=30)
+    btn.pack(pady=10)
+    buttons.append(btn)
+
 score = 0
+current = 0
 
-for question, options, correct in quiz_data:
-    print("_________________")
-    print(question)
-    for opt in options:
-        print(opt)
+def next_question():
+    global current
+    if current >= len(quiz_data):
+        question_label.config(text=f"Quiz Over! Score: {score}/{len(quiz_data)}")
+        for btn in buttons:
+            btn.pack_forget()
+        return
+    q, opts, _ = quiz_data[current]
+    question_label.config(text=q)
+    for idx, btn in enumerate(buttons):
+        btn.config(text=opts[idx], command=lambda opt=chr(65+idx): check_answer(opt))
+    root.configure(bg="black")
 
-    guess = input("Enter your choice of answer (A, B, C, or D): ").upper()
-
-    if guess == correct:
+def check_answer(choice):
+    global score, current
+    correct = quiz_data[current][2]
+    if choice == correct:
+        root.configure(bg="green")
         score += 1
-        print("Koreque! UwU")
     else:
-        print("INCORRECT >:c ")
-        print(f"{correct} is the correct answer.")
+        root.configure(bg="red")
+    current += 1
+    root.after(1000, next_question)
 
-print("__________")
-print("     RESULTS     ")
-print("______________")
-print(f"Your score is: {score}/{len(quiz_data)}")
+next_question()
+root.mainloop()
+
