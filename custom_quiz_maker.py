@@ -1,7 +1,7 @@
 import tkinter as tk
 import random
 
-file_path = r"C:\\OOP\\simple-number-programs\\quiz_maker\\confidential_quiz_bank.txt"
+file_path = r"C:\\OOP\\simple-number-programs\\quiz_maker\\saved_quiz_data.txt"
 
 questions = []
 options = []
